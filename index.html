@@ -1,0 +1,326 @@
+<!DOCTYPE html><html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Vietlott AI GOD</title><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png"><style>
+
+body{
+margin:0;
+font-family:Arial;
+text-align:center;
+color:white;
+
+background:linear-gradient(270deg,#1a1a2e,#16213e,#0f3460,#533483);
+background-size:600% 600%;
+animation:bg 20s infinite;
+}
+
+@keyframes bg{
+0%{background-position:0%}
+50%{background-position:100%}
+100%{background-position:0%}
+}
+
+.logo img{width:80px;margin-top:20px;}
+
+.clock{margin-top:5px}
+
+.led{
+width:10px;height:10px;
+background:#00ff00;
+display:inline-block;
+border-radius:50%;
+animation:blink 1s infinite;
+}
+
+@keyframes blink{
+0%{opacity:1}
+50%{opacity:0.3}
+100%{opacity:1}
+}
+
+.ball{
+width:55px;height:55px;
+line-height:55px;
+border-radius:50%;
+display:inline-block;
+margin:6px;
+background:gold;
+color:black;
+font-weight:bold;
+box-shadow:0 0 12px gold;
+}
+
+.power{background:red;color:white;}
+
+button{
+margin:4px;
+padding:10px;
+border-radius:20px;
+border:none;
+background:gold;
+color:black;
+}
+
+.buttons{
+position:fixed;
+bottom:10px;
+width:100%;
+}
+
+.popup{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:#222;
+padding:25px;
+border-radius:15px;
+display:none;
+width:90%;
+max-width:420px;
+}
+
+.popup select, .popup button{
+width:100%;
+padding:15px;
+font-size:18px;
+margin-top:10px;
+}
+
+.fire{
+position:fixed;
+bottom:0;
+width:6px;height:6px;
+background:orange;
+border-radius:50%;
+animation:rocket 1s forwards;
+}
+
+@keyframes rocket{
+to{transform:translateY(-100vh)}
+}
+
+canvas{margin-top:10px}
+
+</style></head><body><div class="logo">
+<img src="icon.png">
+<h2>Vietlott AI GOD</h2>
+</div><div class="clock" id="clock"></div><div>
+<span class="led"></span> Đang kết nối Vietlott
+</div><h3 id="title">Kết quả</h3><div id="result"></div><button onclick="openBirth()">🎂 Ngày sinh</button>
+<button onclick="aiMega()">🤖 AI Mega</button>
+<button onclick="aiPower()">🤖 AI Power</button>
+<button onclick="aiJackpot()">💎 AI Jackpot</button>
+
+<canvas id="chart" width="320" height="120"></canvas>
+<canvas id="wheel" width="200" height="200"></canvas>
+
+<div id="heatmap"></div><div class="buttons"><button onclick="mega()">Mega</button>
+<button onclick="power()">Power</button>
+<button onclick="bingo()">Bingo</button>
+<button onclick="keno()">Keno</button>
+
+<br><button onclick="lotto()">Lotto</button>
+<button onclick="max3d()">Max3D</button>
+<button onclick="max3dplus()">Max3D+</button>
+<button onclick="max3dpro()">Max3D Pro</button>
+
+</div><div id="popup" class="popup"><select id="d"></select>
+<select id="m"></select>
+<select id="y"></select>
+
+<button onclick="birthPredict()">Dự đoán</button>
+<button onclick="closeBirth()">Đóng</button>
+
+</div><script>
+
+/* CLOCK */
+
+setInterval(()=>{
+let d=new Date()
+clock.innerText=
+d.toLocaleDateString()+" "+
+d.toLocaleTimeString()
+},1000)
+
+/* RANDOM */
+
+function r(max){return Math.floor(Math.random()*max)+1}
+
+function u(c,m){
+let a=[]
+while(a.length<c){
+let n=r(m)
+if(!a.includes(n)) a.push(n)
+}
+return a
+}
+
+/* AI LOGIC */
+
+function aiSmart(count,max){
+
+let pool=[]
+
+for(let i=1;i<=max;i++){
+
+let weight=Math.random()
+
+if(i%2==0) weight+=0.2
+if(i>max/2) weight+=0.2
+
+pool.push({n:i,w:weight})
+
+}
+
+pool.sort((a,b)=>b.w-a.w)
+
+return pool.slice(0,count).map(x=>x.n)
+
+}
+
+/* SHOW */
+
+function show(nums,power,name){
+
+title.innerText="🎰 "+name
+
+result.innerHTML=""
+
+nums.forEach(n=>{
+let b=document.createElement("div")
+b.className="ball"
+b.innerText=n
+result.appendChild(b)
+})
+
+if(power){
+let p=document.createElement("div")
+p.className="ball power"
+p.innerText=power
+result.appendChild(p)
+}
+
+effects()
+chart()
+heatmap()
+wheel()
+
+}
+
+/* GAMES */
+
+function mega(){show(u(6,45),0,"Mega 6/45")}
+function power(){show(u(6,55),r(55),"Power 6/55")}
+function bingo(){show(u(5,18),0,"Bingo")}
+function keno(){show(u(10,80),0,"Keno")}
+function lotto(){show(u(5,35),0,"Lotto")}
+function max3d(){show([r(9),r(9),r(9)],0,"Max3D")}
+function max3dplus(){show([r(9),r(9),r(9),r(9)],0,"Max3D+")}
+function max3dpro(){show([r(9),r(9),r(9),r(9),r(9)],0,"Max3D Pro")}
+
+/* AI */
+
+function aiMega(){show(aiSmart(6,45),0,"AI Mega")}
+function aiPower(){show(aiSmart(6,55),r(55),"AI Power")}
+
+function aiJackpot(){
+
+let chance=Math.floor(Math.random()*100)
+
+let nums=aiSmart(6,45)
+
+show(nums,0,"AI Jackpot ("+chance+"%)")
+
+}
+
+/* EFFECTS */
+
+function effects(){
+
+// fire
+for(let i=0;i<20;i++){
+let f=document.createElement("div")
+f.className="fire"
+f.style.left=Math.random()*100+"%"
+document.body.appendChild(f)
+setTimeout(()=>f.remove(),1000)
+}
+
+// sound
+let ctx=new (window.AudioContext||window.webkitAudioContext)()
+let o=ctx.createOscillator()
+let g=ctx.createGain()
+o.connect(g);g.connect(ctx.destination)
+o.start()
+g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+0.5)
+
+// vibrate
+navigator.vibrate&&navigator.vibrate([200,100,200])
+
+}
+
+/* CHART */
+
+function chart(){
+
+let c=chartEl.getContext("2d")
+chartEl.width=320
+
+for(let i=0;i<20;i++){
+c.fillStyle="cyan"
+c.fillRect(i*15,120-Math.random()*100,10,100)
+}
+
+}
+
+/* HEATMAP */
+
+function heatmap(){
+
+let t="🔥 "
+
+for(let i=1;i<=10;i++){
+t+=i+"("+Math.floor(Math.random()*100)+"%) "
+}
+
+document.getElementById("heatmap").innerText=t
+
+}
+
+/* WHEEL */
+
+function wheel(){
+
+let c=document.getElementById("wheel")
+let ctx=c.getContext("2d")
+
+ctx.clearRect(0,0,200,200)
+
+for(let i=0;i<10;i++){
+ctx.beginPath()
+ctx.arc(100,100,80,0,Math.PI*2)
+ctx.strokeStyle="gold"
+ctx.stroke()
+}
+
+}
+
+/* BIRTH */
+
+function openBirth(){popup.style.display="block"}
+function closeBirth(){popup.style.display="none"}
+
+function birthPredict(){
+show(aiSmart(6,45),0,"Theo ngày sinh")
+}
+
+/* SELECT */
+
+for(let i=1;i<=31;i++){d.add(new Option(i))}
+for(let i=1;i<=12;i++){m.add(new Option(i))}
+for(let i=1950;i<=2025;i++){y.add(new Option(i))}
+
+</script></body>
+</html>
