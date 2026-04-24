@@ -1,16 +1,14 @@
 <!DOCTYPE html><html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Vietlott AI GOD</title><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="icon.png">
-<link rel="apple-touch-icon" href="icon.png"><style>
+<title>Vietlott AI PRO 29</title><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="icon.png"><style>
 
 body{
 margin:0;
 font-family:Arial;
 text-align:center;
 color:white;
-
-background:linear-gradient(270deg,#1a1a2e,#16213e,#0f3460,#533483);
+background:linear-gradient(270deg,#0f2027,#203a43,#2c5364);
 background-size:600% 600%;
 animation:bg 20s infinite;
 }
@@ -19,24 +17,6 @@ animation:bg 20s infinite;
 0%{background-position:0%}
 50%{background-position:100%}
 100%{background-position:0%}
-}
-
-.logo img{width:80px;margin-top:20px;}
-
-.clock{margin-top:5px}
-
-.led{
-width:10px;height:10px;
-background:#00ff00;
-display:inline-block;
-border-radius:50%;
-animation:blink 1s infinite;
-}
-
-@keyframes blink{
-0%{opacity:1}
-50%{opacity:0.3}
-100%{opacity:1}
 }
 
 .ball{
@@ -48,7 +28,6 @@ margin:6px;
 background:gold;
 color:black;
 font-weight:bold;
-box-shadow:0 0 12px gold;
 }
 
 .power{background:red;color:white;}
@@ -68,25 +47,40 @@ bottom:10px;
 width:100%;
 }
 
-.popup{
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-background:#222;
-padding:25px;
-border-radius:15px;
-display:none;
-width:90%;
-max-width:420px;
+/* JACKPOT */
+
+.bar{
+height:14px;
+width:30%;
+background:green;
+transition:0.5s;
 }
 
-.popup select, .popup button{
-width:100%;
-padding:15px;
-font-size:18px;
-margin-top:10px;
+.meter{
+width:80%;
+background:#333;
+margin:auto;
+border-radius:10px;
+overflow:hidden;
 }
+
+#advice{margin-top:5px;font-weight:bold}
+
+/* LED */
+
+.led{
+width:10px;height:10px;
+background:#00ff00;
+border-radius:50%;
+display:inline-block;
+animation:blink 1s infinite;
+}
+
+@keyframes blink{
+50%{opacity:0.3}
+}
+
+/* FIRE */
 
 .fire{
 position:fixed;
@@ -103,20 +97,17 @@ to{transform:translateY(-100vh)}
 
 canvas{margin-top:10px}
 
-</style></head><body><div class="logo">
-<img src="icon.png">
-<h2>Vietlott AI GOD</h2>
-</div><div class="clock" id="clock"></div><div>
-<span class="led"></span> Đang kết nối Vietlott
-</div><h3 id="title">Kết quả</h3><div id="result"></div><button onclick="openBirth()">🎂 Ngày sinh</button>
-<button onclick="aiMega()">🤖 AI Mega</button>
-<button onclick="aiPower()">🤖 AI Power</button>
-<button onclick="aiJackpot()">💎 AI Jackpot</button>
-
-<canvas id="chart" width="320" height="120"></canvas>
+</style></head><body><h2>🎰 Vietlott AI PRO 29</h2><div id="clock"></div><div><span class="led"></span> Đang kết nối Vietlott</div><div class="meter">
+<div id="bar" class="bar"></div>
+</div><div id="percent">30%</div>
+<div id="advice"></div><h3 id="title">Kết quả</h3><div id="result"></div><canvas id="chart" width="320" height="120"></canvas>
 <canvas id="wheel" width="200" height="200"></canvas>
 
-<div id="heatmap"></div><div class="buttons"><button onclick="mega()">Mega</button>
+<div id="heatmap"></div><button onclick="aiMega()">🤖 AI Mega</button>
+<button onclick="aiPower()">🤖 AI Power</button>
+<button onclick="aiJackpot()">💎 Jackpot AI</button>
+
+<div class="buttons"><button onclick="mega()">Mega</button>
 <button onclick="power()">Power</button>
 <button onclick="bingo()">Bingo</button>
 <button onclick="keno()">Keno</button>
@@ -126,22 +117,12 @@ canvas{margin-top:10px}
 <button onclick="max3dplus()">Max3D+</button>
 <button onclick="max3dpro()">Max3D Pro</button>
 
-</div><div id="popup" class="popup"><select id="d"></select>
-<select id="m"></select>
-<select id="y"></select>
-
-<button onclick="birthPredict()">Dự đoán</button>
-<button onclick="closeBirth()">Đóng</button>
-
 </div><script>
 
 /* CLOCK */
 
 setInterval(()=>{
-let d=new Date()
-clock.innerText=
-d.toLocaleDateString()+" "+
-d.toLocaleTimeString()
+clock.innerText=new Date().toLocaleString()
 },1000)
 
 /* RANDOM */
@@ -157,26 +138,96 @@ if(!a.includes(n)) a.push(n)
 return a
 }
 
-/* AI LOGIC */
+/* DATA SIMULATION */
 
-function aiSmart(count,max){
+let history=[]
 
-let pool=[]
+function generateHistory(){
 
-for(let i=1;i<=max;i++){
-
-let weight=Math.random()
-
-if(i%2==0) weight+=0.2
-if(i>max/2) weight+=0.2
-
-pool.push({n:i,w:weight})
+for(let i=0;i<1000;i++){
+history.push(u(6,45))
+}
 
 }
 
-pool.sort((a,b)=>b.w-a.w)
+generateHistory()
 
-return pool.slice(0,count).map(x=>x.n)
+/* HEATMAP */
+
+function getHotNumbers(){
+
+let count={}
+
+history.forEach(draw=>{
+draw.forEach(n=>{
+count[n]=(count[n]||0)+1
+})
+})
+
+let sorted=Object.entries(count).sort((a,b)=>b[1]-a[1])
+
+return sorted.slice(0,6).map(x=>parseInt(x[0]))
+
+}
+
+/* AI */
+
+function aiMega(){
+
+let nums=getHotNumbers()
+
+show(nums,0,"AI Mega (Hot)")
+
+}
+
+function aiPower(){
+
+let nums=u(6,55)
+
+show(nums,r(55),"AI Power")
+
+}
+
+/* JACKPOT */
+
+let cycle=0
+
+function jackpotAI(){
+
+cycle++
+
+let p=Math.min(95,cycle+Math.random()*20)
+
+percent.innerText=Math.floor(p)+"%"
+
+bar.style.width=p+"%"
+
+if(p<40){
+bar.style.background="green"
+advice.innerText="🟢 Quan sát"
+}
+else if(p<70){
+bar.style.background="orange"
+advice.innerText="🟡 Cân nhắc"
+}
+else{
+bar.style.background="red"
+advice.innerText="🔴 Nên vào tiền"
+}
+
+return p
+
+}
+
+setInterval(jackpotAI,2000)
+
+function aiJackpot(){
+
+let nums=getHotNumbers()
+
+let p=jackpotAI()
+
+show(nums,0,"Jackpot AI "+Math.floor(p)+"%")
 
 }
 
@@ -185,7 +236,6 @@ return pool.slice(0,count).map(x=>x.n)
 function show(nums,power,name){
 
 title.innerText="🎰 "+name
-
 result.innerHTML=""
 
 nums.forEach(n=>{
@@ -203,44 +253,17 @@ result.appendChild(p)
 }
 
 effects()
-chart()
-heatmap()
-wheel()
+drawChart()
+drawWheel()
+heat()
 
 }
 
-/* GAMES */
-
-function mega(){show(u(6,45),0,"Mega 6/45")}
-function power(){show(u(6,55),r(55),"Power 6/55")}
-function bingo(){show(u(5,18),0,"Bingo")}
-function keno(){show(u(10,80),0,"Keno")}
-function lotto(){show(u(5,35),0,"Lotto")}
-function max3d(){show([r(9),r(9),r(9)],0,"Max3D")}
-function max3dplus(){show([r(9),r(9),r(9),r(9)],0,"Max3D+")}
-function max3dpro(){show([r(9),r(9),r(9),r(9),r(9)],0,"Max3D Pro")}
-
-/* AI */
-
-function aiMega(){show(aiSmart(6,45),0,"AI Mega")}
-function aiPower(){show(aiSmart(6,55),r(55),"AI Power")}
-
-function aiJackpot(){
-
-let chance=Math.floor(Math.random()*100)
-
-let nums=aiSmart(6,45)
-
-show(nums,0,"AI Jackpot ("+chance+"%)")
-
-}
-
-/* EFFECTS */
+/* EFFECT */
 
 function effects(){
 
-// fire
-for(let i=0;i<20;i++){
+for(let i=0;i<15;i++){
 let f=document.createElement("div")
 f.className="fire"
 f.style.left=Math.random()*100+"%"
@@ -248,7 +271,6 @@ document.body.appendChild(f)
 setTimeout(()=>f.remove(),1000)
 }
 
-// sound
 let ctx=new (window.AudioContext||window.webkitAudioContext)()
 let o=ctx.createOscillator()
 let g=ctx.createGain()
@@ -256,17 +278,16 @@ o.connect(g);g.connect(ctx.destination)
 o.start()
 g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+0.5)
 
-// vibrate
 navigator.vibrate&&navigator.vibrate([200,100,200])
 
 }
 
 /* CHART */
 
-function chart(){
+function drawChart(){
 
-let c=chartEl.getContext("2d")
-chartEl.width=320
+let c=chart.getContext("2d")
+chart.width=320
 
 for(let i=0;i<20;i++){
 c.fillStyle="cyan"
@@ -275,52 +296,42 @@ c.fillRect(i*15,120-Math.random()*100,10,100)
 
 }
 
-/* HEATMAP */
-
-function heatmap(){
-
-let t="🔥 "
-
-for(let i=1;i<=10;i++){
-t+=i+"("+Math.floor(Math.random()*100)+"%) "
-}
-
-document.getElementById("heatmap").innerText=t
-
-}
-
 /* WHEEL */
 
-function wheel(){
+function drawWheel(){
 
-let c=document.getElementById("wheel")
-let ctx=c.getContext("2d")
-
-ctx.clearRect(0,0,200,200)
+let c=wheel.getContext("2d")
+c.clearRect(0,0,200,200)
 
 for(let i=0;i<10;i++){
-ctx.beginPath()
-ctx.arc(100,100,80,0,Math.PI*2)
-ctx.strokeStyle="gold"
-ctx.stroke()
+c.beginPath()
+c.arc(100,100,80,0,Math.PI*2)
+c.strokeStyle="gold"
+c.stroke()
 }
 
 }
 
-/* BIRTH */
+/* HEAT TEXT */
 
-function openBirth(){popup.style.display="block"}
-function closeBirth(){popup.style.display="none"}
+function heat(){
 
-function birthPredict(){
-show(aiSmart(6,45),0,"Theo ngày sinh")
+let h=getHotNumbers()
+
+heatmap.innerText="🔥 Nóng: "+h.join(", ")
+
 }
 
-/* SELECT */
+/* GAMES */
 
-for(let i=1;i<=31;i++){d.add(new Option(i))}
-for(let i=1;i<=12;i++){m.add(new Option(i))}
-for(let i=1950;i<=2025;i++){y.add(new Option(i))}
+function mega(){show(u(6,45),0,"Mega")}
+function power(){show(u(6,55),r(55),"Power")}
+function bingo(){show(u(5,18),0,"Bingo")}
+function keno(){show(u(10,80),0,"Keno")}
+function lotto(){show(u(5,35),0,"Lotto")}
+function max3d(){show([r(9),r(9),r(9)],0,"Max3D")}
+function max3dplus(){show([r(9),r(9),r(9),r(9)],0,"Max3D+")}
+function max3dpro(){show([r(9),r(9),r(9),r(9),r(9)],0,"Max3D Pro")}
 
 </script></body>
 </html>
